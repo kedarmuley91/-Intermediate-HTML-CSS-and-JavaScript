@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Form with To-Do List and Image Gallery</title>
+  <style>
+    /* Global Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f3f4f6;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 1000px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    /* Form Styling */
+    .form-section, .dynamic-section {
+      margin-bottom: 20px;
+    }
+
+    .form-section form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .form-section label {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .form-section input, .form-section textarea, .form-section button {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .form-section button {
+      background-color: #4CAF50;
+      color: #fff;
+      cursor: pointer;
+      border: none;
+      transition: background 0.3s ease;
+    }
+
+    .form-section button:hover {
+      background-color: #45a049;
+    }
+
+    /* To-Do List & Image Gallery */
+    .dynamic-section h2 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 15px;
+    }
+
+    .dynamic-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .dynamic-controls input[type="text"], .dynamic-controls select, .dynamic-controls button {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .dynamic-controls input[type="file"] {
+      border: none;
+    }
+
+    .dynamic-controls button {
+      background-color: #4CAF50;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .dynamic-controls button:hover {
+      background-color: #45a049;
+    }
+
+    /* Task and Image List Styling */
+    .task-list, .image-gallery {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .task-item, .image-item {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      background-color: #f9f9f9;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      gap: 10px;
+    }
+
+    .task-item p, .image-item img {
+      flex: 1;
+      margin: 0;
+    }
+
+    .image-item img {
+      max-width: 80px;
+      max-height: 80px;
+      border-radius: 5px;
+    }
+
+    .remove-btn {
+      padding: 5px 10px;
+      background-color: #e74c3c;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .remove-btn:hover {
+      background-color: #c0392b;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Contact Form with To-Do List and Image Gallery</h1>
+
+  <!-- Contact Form Section -->
+  <div class="form-section">
+    <form id="contactForm">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="message">Message:</label>
+      <textarea id="message" name="message" rows="4" required></textarea>
+
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <!-- To-Do List and Image Gallery Section -->
+  <div class="dynamic-section">
+    <h2>To-Do List / Image Gallery</h2>
+    
+    <div class="dynamic-controls">
+      <input type="text" id="newTask" placeholder="New Task">
+      <input type="file" id="newImage" accept="image/*" style="display: none;">
+      <select id="entryType" onchange="toggleInput()">
+        <option value="task">Task</option>
+        <option value="image">Image</option>
+      </select>
+      <button onclick="addEntry()">Add</button>
+    </div>
+
+    <ul id="taskList" class="task-list"></ul>
+    <ul id="imageGallery" class="image-gallery"></ul>
+  </div>
+</div>
+
+<script>
+  // Toggle input type between task text and image file
+  function toggleInput() {
+    const entryType = document.getElementById("entryType").value;
+    document.getElementById("newTask").style.display = entryType === "task" ? "block" : "none";
+    document.getElementById("newImage").style.display = entryType === "image" ? "block" : "none";
+  }
+
+  // Add entry (Task or Image) based on selection
+  function addEntry() {
+    const entryType = document.getElementById("entryType").value;
+
+    if (entryType === "task") {
+      const taskText = document.getElementById("newTask").value.trim();
+      if (taskText) {
+        addTask(taskText);
+        document.getElementById("newTask").value = ""; // Clear input
+      } else {
+        alert("Please enter a task.");
+      }
+    } else if (entryType === "image") {
+      const imageFile = document.getElementById("newImage").files[0];
+      if (imageFile) {
+        addImage(imageFile);
+        document.getElementById("newImage").value = ""; // Clear input
+      } else {
+        alert("Please select an image.");
+      }
+    }
+  }
+
+  // Add Task Function
+  function addTask(taskText) {
+    const taskList = document.getElementById("taskList");
+    const taskItem = document.createElement("li");
+    taskItem.classList.add("task-item");
+
+    const taskContent = document.createElement("p");
+    taskContent.textContent = taskText;
+
+    const removeBtn = createRemoveButton(taskItem);
+
+    taskItem.appendChild(taskContent);
+    taskItem.appendChild(removeBtn);
+    taskList.appendChild(taskItem);
+  }
+
+  // Add Image Function
+  function addImage(imageFile) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const imageGallery = document.getElementById("imageGallery");
+      const imageItem = document.createElement("li");
+      imageItem.classList.add("image-item");
+
+      const img = document.createElement("img");
+      img.src = e.target.result;
+      img.alt = "Uploaded Image";
+
+      const removeBtn = createRemoveButton(imageItem);
+
+      imageItem.appendChild(img);
+      imageItem.appendChild(removeBtn);
+      imageGallery.appendChild(imageItem);
+    };
+    reader.readAsDataURL(imageFile); // Convert image to base64
+  }
+
+  // Create Remove Button
+  function createRemoveButton(parentElement) {
+    const removeBtn = document.createElement("button");
+    removeBtn.textContent = "Remove";
+    removeBtn.classList.add("remove-btn");
+    removeBtn.onclick = function() {
+      parentElement.remove();
+    };
+    return removeBtn;
+  }
+</script>
+
+</body>
+</html>
